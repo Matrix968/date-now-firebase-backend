@@ -1,0 +1,210 @@
+/* import express from "express";
+import cors from "cors";
+import admin from "./firebase.js";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+
+ * SIGN UP USER
+ * Creates a new Firebase Authentication user
+app.post("/", async (req, res) => {
+  try {
+    const { email, password, name } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password required" });
+    }
+
+    const userRecord = await admin.auth().createUser({
+      email,
+      password,
+      displayName: name || "",
+    });
+
+    res.status(201).json({
+      message: "User created successfully",
+      uid: userRecord.uid,
+      email: userRecord.email,
+      name: userRecord.displayName,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+ * SIGN UP USER
+ * Creates a new Firebase Authentication user
+ 
+app.post("/signup", async (req, res) => {
+  try {
+    const { email, password, name,  } = req.body;
+    if (!email || !password || !name) {
+      return res.status(400).json({ error: "Email, name and password required" });
+    }
+
+    const userRecord = await admin.auth().createUser({
+      email,
+      password,
+      displayName: name || "",
+    });
+
+    res.status(201).json({
+      message: "User created successfully",
+      uid: userRecord.uid,
+      email: userRecord.email,
+      name: userRecord.displayName,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+
+
+app.delete("/users/:uid", async (req, res) => {
+  try {
+    await admin.auth().deleteUser(req.params.uid);
+    res.json({ message: "user deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});   
+ app.patch("/update-user/:uid", async (req, res) => {
+  try {
+    const { uid, email, password, displayName } = req.body;
+
+    const updatedUser = await admin.auth().updateUser(uid, {
+      email: email,           // optional
+      password: password,     // optional
+      displayName: displayName, // optional
+    });
+
+    res.json({
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+app.get("/users", async (req, res) => {
+  try {
+    const listUsers = await admin.auth().listUsers(1000);
+
+    const users = listUsers.users.map(user => ({
+      uid: user.uid,
+      email: user.email,
+      name: user.displayName,
+      phone: user.phoneNumber,
+      createdAt: user.metadata.creationTime
+    }));
+
+    res.status(200).json({
+      success: true,
+      totalUsers: users.length,
+      users
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+});
+const API = 5000;
+app.listen(API, () => console.log(`Server runing on port http://localhost:5000`));
+const PORT = 9000;
+app.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`));
+
+
+
+/*app.delete("/users/:uid", async (req, res) => {
+  try {
+    await admin.auth().deleteUser(req.params.uid);
+    res.json({ message: "user deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+  
+app.post("/signup", async (req, res) =>{
+  try{
+    const{name, email, schoolName, administratorName, password} = req.body
+    
+    if(!name || !email || password){
+      return res.status(400).json({ error: "Email, Name, and Password required"})
+    }
+    const userRecord = await admin.auth().createUser({
+      email,
+      password,
+      displayName:  name && schoolName && administratorName || "",
+    });
+
+    res.status(201).json({
+      message: "User created successfully",
+      password: userRecord.passwordHash,
+      uid: userRecord.uid,
+      email: userRecord.email,
+      name: userRecord.displayName,
+    });
+  }
+  catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
+}); */
+
+import express from "express";
+import admin from "./firebase.js";
+
+const app = express();
+app.use(express.json());
+
+app.post("/signup", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res
+        .status(400)
+        .json({ error: "email, password and name required" });
+    }
+    const userRecord = await admin.auth().createUser({
+      password,
+      email,
+      displayName: name,
+    });
+    res.status(200).json({
+      message: "user created successfully",
+      uid: userRecord.uid,
+      name: userRecord.displayName,
+      email: userRecord.email,
+      password: userRecord.passwordHash
+    })
+  } catch (error){
+    console.error(error);
+    res.status(400).json({error: error.message})
+  }
+});
+
+const API = 3000
+app.listen( API, ()=>{
+  console.log(`server is running on port http://localhost:${API}`)
+})
+
+
+app.get("/users", async(req, res) =>{
+  const listUsers = await admin.auth().listUsers(1000);
+  const users = listUsers.users.map(user =>({
+    name: user.displayName,
+    email: user.email,
+    password: user.passwordHash,
+    uid: user.uid
+  }))
+
+})
