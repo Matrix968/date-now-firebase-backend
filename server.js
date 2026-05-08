@@ -1,8 +1,7 @@
 import express from "express";
 import admin from "./firebase.js";
-import cors from "cors"
+
 const app = express();
-app.use(cors());
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
